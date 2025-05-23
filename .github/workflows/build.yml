@@ -19,6 +19,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch upstream branch
+        run: |
+          git fetch origin upstream:upstream
+      - name: Merge upstream sources
+        run: |
+          git merge --no-ff upstream --allow-unrelated-histories -m "Merge upstream sources"
 
       - name: Install Build Dependencies
         env:
