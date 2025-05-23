@@ -1,0 +1,65 @@
+name: Build Project
+on:
+  push:
+    branches:
+      - upstream
+jobs:
+  build:
+    runs-on: ${{ matrix.os.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          # - { id: ubuntu, runner: ubuntu-latest }
+          # - { id: windows, runner: windows-latest }
+          # - { id: macos, runner: macos-latest }
+          - { id: fedora, runner: ubuntu-latest, container: fedora:latest }
+        node-version: ["24.0.2"]
+    container: ${{ matrix.os.container }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Build Dependencies
+        env:
+          OS_ID: ${{ matrix.os.id }}
+          RUNNER_OS: ${{ matrix.os.runner }}
+          INSTALL_SCRIPT: scripts/install/${{ matrix.os.id }}.sh
+        run: |
+          echo "INFO: Target OS: $OS_ID, Runner OS: $RUNNER_OS."
+
+          chmod +x $INSTALL_SCRIPT
+          $INSTALL_SCRIPT
+
+          echo "TODO: Finalize OS-specific build dependency installation."
+        shell: bash
+
+      - name: Prepare Build Environment
+        env:
+          OS_ID: ${{ matrix.os.id }}
+          RUNNER_OS: ${{ matrix.os.runner }}
+          PREPARE_SCRIPT: scripts/prepare/${{ matrix.os.id }}.sh
+          NODE_VERSION: ${{ matrix.node-version }}
+        run: |
+          echo "INFO: Preparing build environment for Node.js version: ${{ matrix.node-version }}."
+
+          chmod +x $PREPARE_SCRIPT
+          $PREPARE_SCRIPT $NODE_VERSION
+
+          echo "TODO: Finalize build environment preparation."
+        shell: bash
+
+      - name: Build Project
+        env:
+          OS_ID: ${{ matrix.os.id }}
+          RUNNER_OS: ${{ matrix.os.runner }}
+          BUILD_SCRIPT: scripts/build/${{ matrix.os.id }}.sh
+          NODE_VERSION: ${{ matrix.node-version }}
+        run: |
+          echo "INFO: Building on OS: $OS_ID, Runner OS: $RUNNER_OS."
+
+          chmod +x $BUILD_SCRIPT
+          $BUILD_SCRIPT $NODE_VERSION
+
+          echo "TODO: Finalize OS-specific build steps."
+        shell: bash
