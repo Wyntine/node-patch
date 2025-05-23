@@ -91,7 +91,8 @@ if [ -f $localPatchFile ]; then
 
   if [ "$overwrite" != "y" ]; then
     echo "Continuing with current patch file."
-    cp $localPatchFile $patchFile
+    echo "Exiting..."
+    exit 0
   else
     openPatchEditor
   fi
