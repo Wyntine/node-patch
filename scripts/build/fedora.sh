@@ -10,5 +10,11 @@ fi
 
 rpmBuildHome=$(rpm --eval '%{_topdir}')
 
-rpmbuild --rebuild $rpmBuildHome/SRPMS/node-$version-*.src.rpm
+rpmbuild --rebuild $rpmBuildHome/SRPMS/nodejs-$version-*.src.rpm
+
+if [ $? -ne 0 ]; then
+  echo "Failed to build the RPM."
+  exit 1
+fi
+
 ls $rpmBuildHome/RPMS/x86_64

@@ -45,8 +45,6 @@ jobs:
         run: |
           echo "INFO: Preparing build environment for Node.js version: ${{ matrix.node-version }}."
 
-          ls -a
-
           chmod +x $PREPARE_SCRIPT
           $PREPARE_SCRIPT $NODE_VERSION
 
