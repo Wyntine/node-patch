@@ -17,4 +17,4 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-ls $rpmBuildHome/RPMS/x86_64
+cd ~/

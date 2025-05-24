@@ -82,6 +82,7 @@ jobs:
       - name: Test
         run: |
           tree ${{ github.workspace }} -L 3
+          echo ${{ github.workspace }}
 
       - name: Create release
         uses: elgohr/Github-Release-Action@v5
