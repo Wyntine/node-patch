@@ -78,8 +78,10 @@ jobs:
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
-        with:
-          path: ${{ github.workspace }}/artifacts
+
+      - name: Test
+        run: |
+          tree ${{ github.workspace }} -L 3
 
       - name: Create release
         uses: elgohr/Github-Release-Action@v5
@@ -92,4 +94,4 @@ jobs:
 
       - name: Upload release assets
         run: |
-          gh release upload "${{ github.ref_name }}" "$(echo artifacts/*)" --clobber
+          gh release upload "${{ github.ref_name }}" "$(echo artifacts/**/*)" --clobber
