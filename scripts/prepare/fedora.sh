@@ -10,15 +10,12 @@ fi
 
 startDir=$(pwd)
 patchDir="$startDir/patches"
-srcDir="$startDir/src"
 
 tempDir=$(mktemp -d)
 
 patchFile="node-$version.patch"
 tarFile="node-$versionWithPrefix.tar.gz"
-repoDir="node-$versionWithPrefix"
 
-localTarFile="$srcDir/$tarFile"
 localPatchFile="$patchDir/$patchFile"
 rpmBuildHome=$(rpm --eval '%{_topdir}')
 
@@ -43,38 +40,22 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-if [ -f $localTarFile ]; then
-  echo "Using local tar file: $localTarFile"
-  tar -xzf $localTarFile
-
-  if [ $? -ne 0 ]; then
-    echo "Failed to extract local tar file."
-    exit 1
-  fi
-else
-  echo "Local tar file not found."
-  exit 1
-fi
-
 if [ -f $localPatchFile ]; then
   echo "Continuing with current patch file."
 else
   echo "Local patch file not found."
+  echo "Exiting..."
+  exit 1
+fi
+
+curl -O https://nodejs.org/dist/$versionWithPrefix/node-$versionWithPrefix.tar.gz
+
+if [ $? -ne 0 ]; then
+  echo "Failed to download the source code."
   exit 1
 fi
 
 cp $localPatchFile $patchFile
-
-echo "Cleaning git files..."
-rm -rf $repoDir/.git $repoDir/.github $repoDir/.gitignore
-
-echo "Compressing the source code to $tarFile"
-tar -czf $tarFile $repoDir
-
-if [ $? -ne 0 ]; then
-  echo "Failed to compress the source code."
-  exit 1
-fi
 
 sh $startDir/lib/fedora/createSpec.sh $version
 
