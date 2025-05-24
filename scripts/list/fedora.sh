@@ -9,5 +9,5 @@ if [ -z "$version" ]; then
 fi
 
 rpmBuildHome=$(rpm --eval '%{_topdir}')
-FILES=$rpmBuildHome/RPMS/x86_64/nodejs-$version-*.rpm"
+FILES=$rpmBuildHome/RPMS/x86_64/nodejs-$version-*.rpm
 echo "FILES=$FILES" >> $GITHUB_ENV
