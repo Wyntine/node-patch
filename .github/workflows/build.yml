@@ -13,7 +13,9 @@ jobs:
           # - { id: ubuntu, runner: ubuntu-latest }
           # - { id: windows, runner: windows-latest }
           # - { id: macos, runner: macos-latest }
-          - { id: fedora, runner: ubuntu-latest, container: fedora:latest }
+          - id: fedora
+            runner: ubuntu-latest
+            container: fedora:latest
         node-version: ["24.0.2"]
     container: ${{ matrix.os.container }}
     steps:
