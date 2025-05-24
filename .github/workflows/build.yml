@@ -1,8 +1,8 @@
 name: Build Project
 on:
   push:
-    branches:
-      - upstream
+    tags:
+      - "v*"
 jobs:
   build:
     runs-on: ${{ matrix.os.runner }}

@@ -18,6 +18,8 @@ patchFile="node-$version.patch"
 tarFile="node-$versionWithPrefix.tar.gz"
 repoDir="node-$versionWithPrefix"
 
+mkdir -p $srcDir
+
 localTarFile="$srcDir/$tarFile"
 localPatchFile="$patchDir/$patchFile"
 
