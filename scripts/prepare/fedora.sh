@@ -1,4 +1,4 @@
-#!/bin/bashversion=$1
+#!/bin/bash
 version=$1
 versionWithPrefix=v$1
 
@@ -83,3 +83,4 @@ cp $tarFile $rpmBuildHome/SOURCES/
 cp $patchFile $rpmBuildHome/SOURCES/
 
 rpmbuild -bs node-$version.spec
+cd $startDir
