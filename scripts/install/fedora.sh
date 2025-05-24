@@ -7,6 +7,7 @@ sudo dnf install -y \
   make \
   rpmdevtools \
   ccache \
+  mold \
   ninja-build \
   curl \
   tar

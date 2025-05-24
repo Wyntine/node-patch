@@ -18,50 +18,78 @@ jobs:
             container: fedora:latest
         node-version: ["24.0.2"]
     container: ${{ matrix.os.container }}
+    env:
+      OS_ID: ${{ matrix.os.id }}
+      RUNNER_OS: ${{ matrix.os.runner }}
+      NODE_VERSION: ${{ matrix.node-version }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Build Dependencies
+      - name: Install build dependencies
         env:
-          OS_ID: ${{ matrix.os.id }}
-          RUNNER_OS: ${{ matrix.os.runner }}
           INSTALL_SCRIPT: scripts/install/${{ matrix.os.id }}.sh
         run: |
-          echo "INFO: Target OS: $OS_ID, Runner OS: $RUNNER_OS."
-
           chmod +x $INSTALL_SCRIPT
           $INSTALL_SCRIPT
-
-          echo "TODO: Finalize OS-specific build dependency installation."
         shell: bash
 
-      - name: Prepare Build Environment
+      - name: Prepare build environment
         env:
-          OS_ID: ${{ matrix.os.id }}
-          RUNNER_OS: ${{ matrix.os.runner }}
           PREPARE_SCRIPT: scripts/prepare/${{ matrix.os.id }}.sh
-          NODE_VERSION: ${{ matrix.node-version }}
         run: |
-          echo "INFO: Preparing build environment for Node.js version: ${{ matrix.node-version }}."
-
           chmod +x $PREPARE_SCRIPT
           $PREPARE_SCRIPT $NODE_VERSION
-
-          echo "TODO: Finalize build environment preparation."
         shell: bash
 
-      - name: Build Project
-        env:
-          OS_ID: ${{ matrix.os.id }}
-          RUNNER_OS: ${{ matrix.os.runner }}
-          BUILD_SCRIPT: scripts/build/${{ matrix.os.id }}.sh
-          NODE_VERSION: ${{ matrix.node-version }}
-        run: |
-          echo "INFO: Building on OS: $OS_ID, Runner OS: $RUNNER_OS."
+      - name: Enable build caching
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          max-size: 5G
+          key: ${{ matrix.os.id }}-${{ matrix.node-version }}
 
+      - name: Build project
+        env:
+          BUILD_SCRIPT: scripts/build/${{ matrix.os.id }}.sh
+        run: |
           chmod +x $BUILD_SCRIPT
           $BUILD_SCRIPT $NODE_VERSION
-
-          echo "TODO: Finalize OS-specific build steps."
         shell: bash
+
+      - name: List build files
+        env:
+          LIST_SCRIPT: scripts/list/${{ matrix.os.id }}.sh
+        run: |
+          chmod +x $LIST_SCRIPT
+          $LIST_SCRIPT $NODE_VERSION
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          retention-days: 1
+          overwrite: true
+          name: build-${{ matrix.os.id }}-${{ matrix.node-version }}
+          path: ${{ env.FILES }}
+  release:
+    name: Create GitHub release
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create release
+        uses: elgohr/Github-Release-Action@v5
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          title: Release ${{ github.ref_name }}
+          workdir: artifacts
+          tag: ${{ github.ref_name }}
+
+      - name: Upload release assets
+        run: |
+          gh release upload "${{ github.ref_name }}" "$(echo artifacts/*)" --clobber

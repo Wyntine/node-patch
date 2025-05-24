@@ -40,7 +40,9 @@ Node.js is a JavaScript runtime built on Chrome's V8 JavaScript engine.
 %build
 export CFLAGS=""
 export CXXFLAGS=""
-export LDFLAGS=""
+export CC="ccache gcc"
+export CXX="ccache g++"
+export LDFLAGS="-fuse-ld=mold"
 ./configure --prefix=/usr --ninja
 make
 
