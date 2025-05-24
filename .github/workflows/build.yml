@@ -79,7 +79,7 @@ jobs:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
-          path: artifacts
+          path: ${{ github.workspace }}/artifacts
 
       - name: Create release
         uses: elgohr/Github-Release-Action@v5
